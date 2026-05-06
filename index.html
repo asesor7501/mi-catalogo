@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de Productos</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f6f9;
+--surface: #ffffff;
+--surface2: #f0f2f5;
+--surface3: #e8ebf0;
+--border: #dde1e8;
+--text: #111827;
+--text-muted: #6b7280;
+--text-light: #9ca3af;
+--shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ─── HEADER ─── */
+header {
+  padding: 0 32px;
+  height: 60px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(16px);
+  z-index: 100;
+}
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-dot {
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.85)} }
+
+.header-right { display:flex; align-items:center; gap:16px; }
+.update-badge {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: flex; align-items:center; gap:6px;
+}
+.update-badge .dot-green {
+  width:6px; height:6px; border-radius:50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+.btn-upload {
+  display: inline-flex; align-items:center; gap:7px;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.btn-upload:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(249,115,22,0.4); }
+#file-input { display:none; }
+
+/* ─── TOOLBAR ─── */
+.toolbar {
+  padding: 12px 32px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.search-wrap { position:relative; flex:1; min-width:240px; }
+.search-wrap svg { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
+#search {
+  width:100%;
+  padding: 9px 12px 9px 36px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+#search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.15); }
+#search::placeholder { color: var(--text-light); }
+select {
+  padding: 9px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  min-width: 170px;
+  transition: border-color 0.2s;
+}
+select:focus { border-color: var(--accent); }
+.filter-chip {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+.filter-chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  padding: 7px 32px;
+  display: flex; gap:20px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  background: var(--bg);
+}
+.stats-bar strong { color: var(--accent); font-weight: 700; }
+
+/* ─── MAIN GRID ─── */
+main { padding: 24px 32px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+/* ─── CARD ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  animation: fadeUp 0.3s ease both;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.card:hover {
+  border-color: rgba(249,115,22,0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(249,115,22,0.15);
+}
+
+/* IMAGE */
+.card-img {
+  width:100%; aspect-ratio: 4/3;
+  background: var(--surface2);
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items:center; justify-content:center;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.card-img img {
+  width:100%; height:100%;
+  object-fit: contain;
+  padding: 12px;
+  background: #fff;
+  transition: transform 0.3s;
+}
+.card:hover .card-img img { transform: scale(1.05); }
+.img-placeholder {
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  color: var(--text-light); font-size: 11px;
+}
+.img-placeholder svg { opacity:0.25; }
+.img-overlay-btn {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.5);
+  opacity:0; transition:opacity 0.2s;
+  font-size: 12px; font-weight:600; color:white; gap:6px;
+}
+.card-img:hover .img-overlay-btn { opacity:1; }
+
+/* BODY */
+.card-body { padding: 12px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1; }
+.card-code {
+  font-size: 10px;
+  color: var(--text-light);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.card-desc {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text);
+  flex:1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card-grupo {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: var(--accent-dim);
+  padding: 2px 7px;
+  border-radius: 3px;
+  display: inline-block;
+  width: fit-content;
+}
+
+/* PRECIO */
+.card-price-block {
+  margin-top: 4px;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.price-row {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 11px;
+}
+.price-label { color: var(--text-muted); }
+.price-val { font-weight: 600; color: var(--text); }
+.price-divider { border:none; border-top: 1px solid var(--border); margin: 5px 0; }
+.price-total-label { color: var(--text-muted); font-size:11px; }
+.price-total-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.5px;
+}
+.price-exc {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* STOCK */
+.card-footer {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top: 4px;
+}
+.stock-pill {
+  display:inline-flex; align-items:center; gap:5px;
+  padding: 3px 8px; border-radius:20px;
+  font-size: 10px; font-weight:600;
+}
+.stock-ok  { background: var(--green-bg);  color: var(--green); }
+.stock-low { background: var(--yellow-bg); color: var(--yellow); }
+.stock-out { background: var(--red-bg);    color: var(--red); }
+.stock-dot { width:5px; height:5px; border-radius:50%; background:currentColor; }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position:fixed; inset:0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(6px);
+  z-index:200;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: min(680px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+  transform: scale(0.95);
+  transition: transform 0.2s;
+}
+.modal-overlay.open .modal { transform: scale(1); }
+.modal-header {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display:flex; align-items:center; gap:12px;
+}
+.modal-title {
+  font-size: 14px; font-weight:600; color:var(--text); flex:1;
+  white-space: nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.modal-close {
+  width:28px; height:28px;
+  border-radius:6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-muted);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:16px; transition:all 0.2s; flex-shrink:0;
+}
+.modal-close:hover { border-color:var(--red); color:var(--red); }
+
+/* Modal tabs */
+.modal-tabs {
+  display:flex; border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+}
+.modal-tab {
+  padding: 10px 16px;
+  font-size: 13px; font-weight:500;
+  color: var(--text-muted);
+  cursor:pointer; border:none; background:none;
+  border-bottom: 2px solid transparent;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+}
+.modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.modal-tab-content { display:none; padding:16px 20px; }
+.modal-tab-content.active { display:block; }
+
+/* Google Drive tab */
+.drive-input-group { display:flex; gap:8px; margin-bottom:12px; }
+.drive-input {
+  flex:1; padding: 9px 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text);
+  font-family: 'Outfit', sans-serif; font-size:13px; outline:none;
+  transition: border-color 0.2s;
+}
+.drive-input:focus { border-color: var(--accent); }
+.drive-input::placeholder { color: var(--text-light); }
+.btn-load-drive {
+  padding: 9px 16px;
+  background: var(--accent); color:white; border:none;
+  border-radius: var(--radius); font-family:'Outfit',sans-serif;
+  font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s;
+  white-space:nowrap;
+}
+.btn-load-drive:hover { background:var(--accent2); }
+.drive-preview {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow:hidden; background: var(--surface2);
+  min-height: 200px; display:flex; align-items:center; justify-content:center;
+}
+.drive-preview img { max-width:100%; max-height:300px; object-fit:contain; display:block; }
+.drive-hint {
+  font-size:11px; color:var(--text-light); line-height:1.6;
+  padding: 10px 12px; background: rgba(249,115,22,0.06);
+  border: 1px solid rgba(249,115,22,0.2); border-radius:6px; margin-bottom:12px;
+}
+.drive-hint strong { color:var(--accent); }
+
+/* Search tab - Google Images */
+.google-input-group { display:flex; gap:8px; margin-bottom:12px; }
+.google-search-input {
+  flex:1; padding: 9px 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text);
+  font-family: 'Outfit', sans-serif; font-size:13px; outline:none;
+}
+.google-search-input:focus { border-color: var(--accent); }
+.btn-google {
+  padding: 9px 14px;
+  background: var(--surface3); color:var(--text); border: 1px solid var(--border);
+  border-radius: var(--radius); font-family:'Outfit',sans-serif;
+  font-size:13px; cursor:pointer; transition:all 0.2s; white-space:nowrap;
+}
+.btn-google:hover { border-color:var(--accent); color:var(--accent); }
+
+/* Modal image grid */
+.modal-imgs {
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap:8px; margin-bottom:12px;
+}
+.modal-img-option {
+  border-radius: 6px; overflow:hidden;
+  border: 2px solid var(--border);
+  cursor:pointer; aspect-ratio:4/3;
+  display:flex; align-items:center; justify-content:center;
+  background: #fff; transition: border-color 0.2s, transform 0.15s;
+}
+.modal-img-option:hover { border-color:var(--accent); transform:scale(1.02); }
+.modal-img-option.selected { border-color:var(--accent); box-shadow:0 0 0 2px rgba(249,115,22,0.3); }
+.modal-img-option img { width:100%; height:100%; object-fit:contain; padding:6px; }
+
+/* URL tab */
+.url-input {
+  width:100%; padding: 9px 12px; margin-bottom:12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text);
+  font-family: 'Outfit', sans-serif; font-size:13px; outline:none;
+  transition: border-color 0.2s;
+}
+.url-input:focus { border-color: var(--accent); }
+.url-preview { text-align:center; margin-bottom:12px; }
+.url-preview img { max-width:100%; max-height:220px; object-fit:contain; border-radius:6px; border:1px solid var(--border); padding:8px; background:#fff; }
+
+.modal-actions {
+  display:flex; gap:8px; justify-content:flex-end;
+  padding-top:12px; border-top:1px solid var(--border); margin-top:4px;
+}
+.btn-cancel {
+  padding: 8px 16px; border-radius:var(--radius);
+  border: 1px solid var(--border); background:transparent;
+  color:var(--text-muted); font-family:'Outfit',sans-serif;
+  font-size:13px; cursor:pointer; transition:all 0.2s;
+}
+.btn-cancel:hover { border-color:var(--red); color:var(--red); }
+.btn-confirm {
+  padding: 8px 18px; border-radius:var(--radius);
+  background:var(--accent); border:none; color:white;
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer; transition:all 0.2s;
+}
+.btn-confirm:hover { background:var(--accent2); }
+.btn-remove {
+  padding: 8px 14px; border-radius:var(--radius);
+  background:var(--red-bg); border:1px solid var(--red);
+  color:var(--red); font-family:'Outfit',sans-serif;
+  font-size:13px; cursor:pointer; transition:all 0.2s;
+}
+.btn-remove:hover { background:var(--red); color:white; }
+
+.modal-loading {
+  display:flex; flex-direction:column; align-items:center;
+  gap:12px; padding:40px 0; color:var(--text-muted); font-size:13px;
+}
+.spinner {
+  width:28px; height:28px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius:50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to{ transform:rotate(360deg); } }
+
+/* ─── EMPTY / NO RESULTS ─── */
+.no-results {
+  grid-column: 1/-1;
+  text-align:center; padding:80px 0;
+  color: var(--text-muted);
+}
+.no-results h3 { font-size:18px; margin-bottom:8px; color:var(--text); }
+.no-results p { font-size:13px; }
+
+/* ─── TOAST ─── */
+.toast {
+  position:fixed; bottom:24px; right:24px;
+  background: var(--surface);
+  border: 1px solid var(--green);
+  color: var(--green);
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  font-size: 13px; font-weight:500;
+  box-shadow: var(--shadow);
+  z-index:999;
+  opacity:0; transform:translateY(10px);
+  transition: all 0.25s;
+  pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateY(0); }
+
+/* ─── EMPTY STATE (sin productos) ─── */
+.empty-state {
+  grid-column:1/-1;
+  display:flex; flex-direction:column; align-items:center;
+  padding: 80px 0; gap:16px; text-align:center;
+}
+.empty-state svg { opacity:0.15; }
+.empty-state h2 { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:2px; color:var(--text-muted); }
+.empty-state p { font-size:13px; color:var(--text-light); max-width:320px; line-height:1.6; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width:600px) {
+  header { padding: 0 16px; }
+  .logo { font-size:20px; }
+  .toolbar { padding: 10px 16px; }
+  .stats-bar { padding: 6px 16px; }
+  main { padding: 16px; }
+  .modal-imgs { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    CATÁLOGO
+  </div>
+  <div class="header-right">
+    <div class="update-badge">
+      <span class="dot-green"></span>
+      Actualizado: <span id="last-update">—</span>
+    </div>
+    <button class="btn-upload" id="btn-login" onclick="showLoginModal()" style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)">
+  🔒 Admin
+</button>
+    <button class="btn-upload" id="btn-upload-excel" onclick="document.getElementById('file-input').click()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Subir Excel
+    </button>
+    <input type="file" id="file-input" accept=".xls,.xlsx,.txt,.tsv">
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="Buscar por código o descripción…">
+  </div>
+  <select id="group-filter"><option value="">Todos los grupos</option></select>
+  <button class="filter-chip active" onclick="setStock(this,'all')">Todos</button>
+  <button class="filter-chip" onclick="setStock(this,'disponible')">Con stock</button>
+  <button class="filter-chip" onclick="setStock(this,'agotado')">Agotados</button>
+</div>
+
+<div class="stats-bar">
+  Mostrando <strong id="showing">0</strong> de <strong id="total">0</strong> productos
+</div>
+
+<main>
+  <div class="grid" id="grid">
+    <div class="empty-state">
+      <svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      <h2>Sin Productos</h2>
+      <p>Haz clic en <strong>Subir Excel</strong> para cargar tu lista de precios diaria.</p>
+    </div>
+  </div>
+</main>
+
+<!-- ─── MODAL ─── -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Producto</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('drive')">📁 Google Drive</button>
+      <button class="modal-tab" onclick="switchTab('google')">🔍 Buscar imagen</button>
+      <button class="modal-tab" onclick="switchTab('url')">🔗 URL directa</button>
+    </div>
+    <!-- TAB: DRIVE -->
+    <div class="modal-tab-content active" id="tab-drive">
+      <div class="drive-hint">
+        <strong>¿Cómo usar Google Drive?</strong><br>
+        1. Sube la imagen a tu Google Drive<br>
+        2. Clic derecho → "Obtener enlace" → cambia permisos a <strong>"Cualquier persona con el enlace"</strong><br>
+        3. Pega el enlace aquí abajo
+      </div>
+      <div class="drive-input-group">
+        <input type="text" class="drive-input" id="drive-url-input" placeholder="https://drive.google.com/file/d/XXXXX/view?usp=sharing">
+        <button class="btn-load-drive" onclick="loadDriveImage()">Cargar</button>
+      </div>
+      <div class="drive-preview" id="drive-preview">
+        <div style="color:var(--text-light);font-size:12px;text-align:center;padding:20px">
+          La previsualización aparecerá aquí
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-remove" id="btn-remove-img" style="display:none" onclick="removeImg()">Quitar imagen</button>
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="confirmImg()">✓ Guardar imagen</button>
+      </div>
+    </div>
+    <!-- TAB: GOOGLE SEARCH -->
+    <div class="modal-tab-content" id="tab-google">
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">
+        Configurar Google Custom Search para buscar imágenes automáticamente.
+        <a href="#" onclick="showApiSetup()" style="color:var(--accent);text-decoration:none;"> Ver instrucciones →</a>
+      </p>
+      <div class="google-input-group">
+        <input type="text" class="google-search-input" id="google-query" placeholder="Ej: cable HDMI 4K…">
+        <button class="btn-google" onclick="searchGoogleImages()">Buscar</button>
+      </div>
+      <div id="google-results">
+        <div style="color:var(--text-light);font-size:12px;text-align:center;padding:30px 0">
+          Los resultados aparecerán aquí
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="confirmImg()">✓ Guardar imagen</button>
+      </div>
+    </div>
+    <!-- TAB: URL -->
+    <div class="modal-tab-content" id="tab-url">
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Pega la URL directa de cualquier imagen (.jpg, .png, .webp)</p>
+      <input type="text" class="url-input" id="url-direct-input" placeholder="https://ejemplo.com/imagen.jpg" oninput="previewUrlImage()">
+      <div class="url-preview" id="url-preview" style="display:none">
+        <img id="url-preview-img" src="" alt="preview">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-remove" id="btn-remove-url" style="display:none" onclick="removeImg()">Quitar imagen</button>
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="confirmImgUrl()">✓ Guardar imagen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- API SETUP MODAL -->
+<div class="modal-overlay" id="api-modal" onclick="this.classList.remove('open')">
+  <div class="modal" style="max-width:480px" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Configurar búsqueda de imágenes</div>
+      <button class="modal-close" onclick="document.getElementById('api-modal').classList.remove('open')">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.6">
+        Para buscar imágenes automáticamente necesitas una API key gratuita de Google (100 búsquedas/día).
+      </p>
+      <div>
+        <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Google API Key</label>
+        <input type="text" class="drive-input" id="cfg-api-key" placeholder="AIzaSy...">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Search Engine ID (cx)</label>
+        <input type="text" class="drive-input" id="cfg-cx" placeholder="a1b2c3d4e5f6g...">
+      </div>
+      <p style="font-size:11px;color:var(--text-light);line-height:1.6">
+        Obtén tu key gratis en <strong style="color:var(--accent)">console.cloud.google.com</strong> → Custom Search API → Credenciales
+      </p>
+      <div class="modal-actions" style="border:none;padding-top:0;margin:0">
+        <button class="btn-cancel" onclick="document.getElementById('api-modal').classList.remove('open')">Cancelar</button>
+        <button class="btn-confirm" onclick="saveApiConfig()">Guardar configuración</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PRODUCTS_KEY = 'catalog_products_v3';
+const IMAGES_KEY   = 'catalog_images_v3';
+const UPDATE_KEY   = 'catalog_update_v3';
+const GAPI_KEY     = 'catalog_gapi';
+const GCX_KEY      = 'catalog_gcx';
+
+let allProducts = [];
+let imageCache  = {};
+let stockFilter = 'all';
+let modalCodigo = null;
+let selectedUrl = null;
+let activeTab   = 'drive';
+
+// ─── INIT ───
+function init() {
+  const saved = localStorage.getItem(PRODUCTS_KEY);
+  const date  = localStorage.getItem(UPDATE_KEY);
+  const imgs  = localStorage.getItem(IMAGES_KEY);
+  allProducts = saved ? JSON.parse(saved) : [];
+  imageCache  = imgs  ? JSON.parse(imgs)  : {};
+  if (date) document.getElementById('last-update').textContent = date;
+  document.getElementById('total').textContent = allProducts.length;
+  populateGroups();
+  render();
+}
+
+function populateGroups() {
+  const sel = document.getElementById('group-filter');
+  const grupos = [...new Set(allProducts.map(p => p.grupo).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">Todos los grupos</option>' +
+    grupos.map(g => `<option value="${g}">${g}</option>`).join('');
+}
+
+// ─── RENDER ───
+function setStock(btn, val) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  stockFilter = val;
+  render();
+}
+
+function render() {
+  const q     = document.getElementById('search').value.toLowerCase().trim();
+  const grupo = document.getElementById('group-filter').value;
+
+  const results = allProducts.filter(p => {
+    const mQ = !q || p.descripcion.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q);
+    const mG = !grupo || p.grupo === grupo;
+    const mS = stockFilter === 'all'
+            || (stockFilter === 'disponible' && p.stock > 0)
+            || (stockFilter === 'agotado'    && p.stock === 0);
+    return mQ && mG && mS;
+  });
+
+  document.getElementById('showing').textContent = results.length;
+  const grid = document.getElementById('grid');
+
+  if (!allProducts.length) {
+    grid.innerHTML = `<div class="empty-state">
+      <svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      <h2>Sin Productos</h2>
+      <p>Haz clic en <strong>Subir Excel</strong> para cargar tu lista de precios diaria.</p>
+    </div>`;
+    return;
+  }
+
+  if (!results.length) {
+    grid.innerHTML = '<div class="no-results"><h3>Sin resultados</h3><p>Intenta con otros términos o filtros</p></div>';
+    return;
+  }
+
+  grid.innerHTML = results.map(p => {
+    const sc = p.stock > 10 ? 'stock-ok' : p.stock > 0 ? 'stock-low' : 'stock-out';
+    const sl = p.stock > 10 ? 'Disponible' : p.stock > 0 ? `Stock: ${p.stock}` : 'Agotado';
+
+    const imgUrl = imageCache[p.codigo];
+    const imgHtml = imgUrl
+      ? `<img src="${imgUrl}" alt="${p.descripcion}" onerror="this.style.display='none'">`
+      : `<div class="img-placeholder">
+           <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+           <span>Sin imagen</span>
+         </div>`;
+
+    // Precio block
+    const priceHtml = buildPriceHtml(p);
+
+    return `<div class="card">
+      <div class="card-img" onclick="openModal('${p.codigo}', \`${p.descripcion.replace(/`/g,"'")}\`)">
+        ${imgHtml}
+        <div class="img-overlay-btn">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          ${imgUrl ? 'Cambiar imagen' : 'Agregar imagen'}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-code">${p.codigo}</div>
+        <div class="card-desc">${p.descripcion}</div>
+        <div class="card-grupo">${p.grupo || '—'}</div>
+        ${priceHtml}
+        <div class="card-footer">
+          <div class="stock-pill ${sc}">
+            <span class="stock-dot"></span>${sl}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildPriceHtml(p) {
+  if (!p.precio || p.precio === 0) return '';
+
+  const fmt = n => '$\u00a0' + Math.round(n).toLocaleString('es-CO');
+
+  if (p.impuesto === 0) {
+    // Sin impuesto — solo mostrar precio
+    return `<div class="card-price-block">
+      <div class="price-row">
+        <span class="price-label">Precio</span>
+        <span class="price-exc">${fmt(p.precio)}</span>
+      </div>
+    </div>`;
+  }
+
+  if (p.impuesto === 'EXC') {
+    return `<div class="card-price-block">
+      <div class="price-row">
+        <span class="price-label">Precio (excluido IVA)</span>
+        <span class="price-exc">${fmt(p.precio)}</span>
+      </div>
+    </div>`;
+  }
+
+  // Con IVA (19% u otro porcentaje)
+  const pct = typeof p.impuesto === 'number' ? p.impuesto : 19;
+  const iva = p.precio * pct / 100;
+  const total = p.precio + iva;
+
+  return `<div class="card-price-block">
+    <div class="price-row">
+      <span class="price-label">Precio sin IVA</span>
+      <span class="price-val">${fmt(p.precio)}</span>
+    </div>
+    <div class="price-row" style="margin-top:3px">
+      <span class="price-label">IVA ${pct}%</span>
+      <span class="price-val">${fmt(iva)}</span>
+    </div>
+    <hr class="price-divider">
+    <div class="price-row">
+      <span class="price-total-label">Total con IVA</span>
+      <span class="price-total-val">${fmt(total)}</span>
+    </div>
+  </div>`;
+}
+
+// ─── FILE UPLOAD ───
+document.getElementById('file-input').addEventListener('change', async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  let text;
+  // Detect encoding
+  try {
+    const buf = await file.arrayBuffer();
+    const u16 = new Uint8Array(buf);
+    if (u16[0] === 0xFF && u16[1] === 0xFE) {
+      text = new TextDecoder('utf-16le').decode(buf);
+    } else if (u16[0] === 0xFE && u16[1] === 0xFF) {
+      text = new TextDecoder('utf-16be').decode(buf);
+    } else {
+      text = new TextDecoder('utf-8').decode(buf);
+    }
+  } catch(err) {
+    text = await file.text();
+  }
+
+  // Remove BOM if present
+  text = text.replace(/^\uFEFF/, '');
+
+  const lines = text.split('\n').filter(l => l.trim() && !/^-+[\t-]+$/.test(l.trim()));
+  if (lines.length < 2) { showToast('❌ Archivo vacío o formato no reconocido', true); return; }
+
+  const headers = lines[0].split('\t').map(h => h.trim().toLowerCase());
+  const idx = k => headers.findIndex(h => h.includes(k));
+
+  const codigoIdx = idx('codigo');
+  const descIdx   = idx('descripcion') !== -1 ? idx('descripcion') : idx('desc');
+  const grupoIdx  = idx('grupo');
+  const stockIdx  = idx('stock');
+  const precioIdx = idx('precio') !== -1 ? idx('precio') : idx('antes');
+  const impIdx    = idx('impuesto') !== -1 ? idx('impuesto') : idx('tax');
+
+  if (codigoIdx === -1 || descIdx === -1) {
+    showToast('❌ No se encontraron columnas Codigo/Descripcion', true); return;
+  }
+
+  const products = [];
+  for (let i = 1; i < lines.length; i++) {
+    const c = lines[i].split('\t').map(s => s.trim());
+    const codigo = c[codigoIdx] || '';
+    if (!codigo.startsWith('PRD')) continue;
+
+    const impRaw = impIdx >= 0 ? (c[impIdx] || '').trim() : '';
+    let impuesto;
+    if (impRaw === 'IVAGEXC' || impRaw === 'EXC' || impRaw === '0') {
+      impuesto = 'EXC';
+    } else if (impRaw === 'IVAG01' || impRaw === '19') {
+      impuesto = 19;
+    } else {
+      const n = parseFloat(impRaw);
+      impuesto = isNaN(n) ? 19 : n;
+    }
+
+    let precio = 0;
+    if (precioIdx >= 0) {
+      precio = parseFloat((c[precioIdx] || '').replace(/[$ .]/g,'').replace(',','.')) || 0;
+    }
+
+    products.push({
+      codigo,
+      descripcion: c[descIdx] || '',
+      grupo: grupoIdx >= 0 ? (c[grupoIdx] || '') : '',
+      stock: parseInt(c[stockIdx]) || 0,
+      precio,
+      impuesto
+    });
+  }
+
+  if (!products.length) { showToast('❌ No se encontraron productos válidos (deben empezar con PRD)', true); return; }
+
+  allProducts = products;
+  const now = new Date().toLocaleDateString('es-CO');
+  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+  localStorage.setItem(UPDATE_KEY, now);
+  document.getElementById('last-update').textContent = now;
+  document.getElementById('total').textContent = products.length;
+  populateGroups();
+  render();
+  showToast(`✅ ${products.length} productos cargados`);
+  this.value = '';
+});
+
+// ─── MODAL ───
+function openModal(codigo, descripcion) {
+  if (!isAdmin()) { showToast('🔒 Solo el administrador puede cambiar imágenes', true); return; }
+  modalCodigo = codigo;
+  selectedUrl = imageCache[codigo] || null;
+
+  document.getElementById('modal-title').textContent = descripcion;
+  document.getElementById('drive-url-input').value = '';
+  document.getElementById('url-direct-input').value = '';
+  document.getElementById('url-preview').style.display = 'none';
+  document.getElementById('google-query').value = descripcion;
+  document.getElementById('google-results').innerHTML =
+    '<div style="color:var(--text-light);font-size:12px;text-align:center;padding:30px 0">Los resultados aparecerán aquí</div>';
+
+  // Show remove button if image exists
+  const hasImg = !!imageCache[codigo];
+  document.getElementById('btn-remove-img').style.display = hasImg ? 'inline-flex' : 'none';
+  document.getElementById('btn-remove-url') && (document.getElementById('btn-remove-url').style.display = hasImg ? 'inline-flex' : 'none');
+
+  // If existing image is a drive URL, show it
+  if (hasImg) {
+    const preview = document.getElementById('drive-preview');
+    preview.innerHTML = `<img src="${imageCache[codigo]}" alt="actual" onerror="this.parentElement.innerHTML='<div style=color:var(--text-light);font-size:12px;padding:20px>No se puede previsualizar</div>'">`;
+  } else {
+    document.getElementById('drive-preview').innerHTML =
+      '<div style="color:var(--text-light);font-size:12px;text-align:center;padding:20px">La previsualización aparecerá aquí</div>';
+  }
+
+  switchTab('drive');
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalCodigo = null; selectedUrl = null;
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.modal-tab').forEach((t,i) => {
+    const tabs = ['drive','google','url'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.modal-tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ─── GOOGLE DRIVE ───
+function loadDriveImage() {
+  const raw = document.getElementById('drive-url-input').value.trim();
+  if (!raw) return;
+
+  const url = convertDriveUrl(raw);
+  if (!url) { showToast('❌ URL de Drive no válida', true); return; }
+
+  selectedUrl = url;
+  const preview = document.getElementById('drive-preview');
+  preview.innerHTML = `<div class="modal-loading"><div class="spinner"></div><span>Cargando...</span></div>`;
+
+  const img = new Image();
+  img.onload = () => {
+    preview.innerHTML = `<img src="${url}" alt="preview">`;
+    showToast('✅ Imagen cargada — haz clic en Guardar');
+  };
+  img.onerror = () => {
+    preview.innerHTML = `<div style="color:var(--red);font-size:12px;padding:20px;text-align:center">
+      ⚠️ No se pudo cargar. Verifica que los permisos de Drive sean "Cualquier persona con el enlace".
+    </div>`;
+    selectedUrl = null;
+  };
+  img.src = url;
+}
+
+function convertDriveUrl(raw) {
+  // https://drive.google.com/file/d/FILE_ID/view...
+  const m1 = raw.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m1) return `https://drive.google.com/uc?export=view&id=${m1[1]}`;
+
+  // https://drive.google.com/open?id=FILE_ID
+  const m2 = raw.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m2) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
+
+  // Already a direct uc?export=view link
+  if (raw.includes('drive.google.com/uc')) return raw;
+
+  return null;
+}
+
+// ─── GOOGLE CUSTOM SEARCH ───
+async function searchGoogleImages() {
+  const apiKey = localStorage.getItem(GAPI_KEY);
+  const cx     = localStorage.getItem(GCX_KEY);
+
+  if (!apiKey || !cx) {
+    showApiSetup();
+    return;
+  }
+
+  const query = document.getElementById('google-query').value.trim();
+  if (!query) return;
+
+  const resultsDiv = document.getElementById('google-results');
+  resultsDiv.innerHTML = '<div class="modal-loading"><div class="spinner"></div><span>Buscando imágenes...</span></div>';
+
+  try {
+    const resp = await fetch(
+      `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}&searchType=image&num=6`
+    );
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    if (!data.items?.length) throw new Error('Sin resultados');
+
+    const urls = data.items.map(i => i.link);
+    resultsDiv.innerHTML = `<div class="modal-imgs">
+      ${urls.map(url => `
+        <div class="modal-img-option" onclick="selectGoogleImg(this,'${url}')">
+          <img src="${url}" loading="lazy" onerror="this.parentElement.style.display='none'">
+        </div>`).join('')}
+    </div>`;
+  } catch(err) {
+    resultsDiv.innerHTML = `<p style="color:var(--red);font-size:12px;text-align:center;padding:20px">
+      ⚠️ ${err.message}
+    </p>`;
+  }
+}
+
+function selectGoogleImg(el, url) {
+  document.querySelectorAll('.modal-img-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedUrl = url;
+}
+
+function showApiSetup() {
+  document.getElementById('cfg-api-key').value = localStorage.getItem(GAPI_KEY) || '';
+  document.getElementById('cfg-cx').value = localStorage.getItem(GCX_KEY) || '';
+  document.getElementById('api-modal').classList.add('open');
+}
+
+function saveApiConfig() {
+  const k = document.getElementById('cfg-api-key').value.trim();
+  const c = document.getElementById('cfg-cx').value.trim();
+  if (!k || !c) { showToast('❌ Completa ambos campos', true); return; }
+  localStorage.setItem(GAPI_KEY, k);
+  localStorage.setItem(GCX_KEY, c);
+  document.getElementById('api-modal').classList.remove('open');
+  showToast('✅ Configuración guardada');
+}
+
+// ─── URL DIRECTA ───
+function previewUrlImage() {
+  const url = document.getElementById('url-direct-input').value.trim();
+  const prev = document.getElementById('url-preview');
+  const img  = document.getElementById('url-preview-img');
+  if (!url) { prev.style.display = 'none'; return; }
+  img.src = url;
+  img.onload = () => { prev.style.display = 'block'; selectedUrl = url; };
+  img.onerror = () => { prev.style.display = 'none'; };
+}
+
+function confirmImgUrl() {
+  const url = document.getElementById('url-direct-input').value.trim();
+  if (!url) { showToast('❌ Ingresa una URL', true); return; }
+  selectedUrl = url;
+  confirmImg();
+}
+
+// ─── CONFIRM / REMOVE ───
+function confirmImg() {
+  if (!selectedUrl || !modalCodigo) { showToast('❌ Selecciona una imagen primero', true); return; }
+  imageCache[modalCodigo] = selectedUrl;
+  localStorage.setItem(IMAGES_KEY, JSON.stringify(imageCache));
+  closeModal();
+  render();
+  showToast('✅ Imagen guardada');
+}
+
+function removeImg() {
+  if (!modalCodigo) return;
+  delete imageCache[modalCodigo];
+  localStorage.setItem(IMAGES_KEY, JSON.stringify(imageCache));
+  closeModal();
+  render();
+  showToast('🗑️ Imagen eliminada');
+}
+
+// ─── UTILS ───
+function showToast(msg, err = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = err ? 'var(--red)' : 'var(--green)';
+  t.style.color = err ? 'var(--red)' : 'var(--green)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('group-filter').addEventListener('change', render);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+const ADMIN_KEY = 'catalog_admin_session';
+const PASSWORD  = 'TuContraseña123';
+
+function isAdmin() {
+  return localStorage.getItem(ADMIN_KEY) === 'true';
+}
+
+function showLoginModal() {
+  if (isAdmin()) {
+    localStorage.removeItem(ADMIN_KEY);
+    updateAdminUI();
+    showToast('Sesión cerrada');
+    return;
+  }
+  document.getElementById('password-input').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('login-modal').classList.add('open');
+  setTimeout(() => document.getElementById('password-input').focus(), 100);
+}
+
+function checkPassword() {
+  const val = document.getElementById('password-input').value;
+  if (val === PASSWORD) {
+    localStorage.setItem(ADMIN_KEY, 'true');
+    document.getElementById('login-modal').classList.remove('open');
+    updateAdminUI();
+    showToast('✅ Bienvenido, administrador');
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function updateAdminUI() {
+  const admin = isAdmin();
+  document.getElementById('btn-upload-excel').style.display = admin ? 'inline-flex' : 'none';
+  const btnLogin = document.getElementById('btn-login');
+  btnLogin.textContent = admin ? '🔓 Cerrar sesión' : '🔒 Admin';
+  btnLogin.style.background = admin ? 'var(--red-bg)' : '';
+  btnLogin.style.color = admin ? 'var(--red)' : '';
+}
+
+init();
+updateAdminUI();
+</script>
+<div class="modal-overlay" id="login-modal" onclick="this.classList.remove('open')">
+  <div class="modal" style="max-width:360px" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">🔒 Acceso Administrador</div>
+      <button class="modal-close" onclick="document.getElementById('login-modal').classList.remove('open')">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <input type="password" class="drive-input" id="password-input" placeholder="Contraseña" onkeydown="if(event.key==='Enter')checkPassword()">
+      <button class="btn-confirm" style="width:100%" onclick="checkPassword()">Entrar</button>
+      <p id="login-error" style="color:var(--red);font-size:12px;text-align:center;display:none">Contraseña incorrecta</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
